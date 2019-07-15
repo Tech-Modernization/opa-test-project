@@ -1,0 +1,39 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- azure-pipelines
+
+variables:
+- name: TF_VAR_vault_address
+  value: 'https://vault.nitin.guru:8200'
+- name: VAULT_TOKEN
+  value: '8nPws6r7dMx2yNCYnvCVDhZ0'
+- name: TFE_WORKSPACE_TOKEN
+  value: 'iCC9yRZQLvbGGw.atlasv1.VKDIhi88lKT1Z5zwmHYI0EZKS1N8HJzWjSCf3bCOCoE7uYvO98LTgAQHy1J7RpmPzeA'
+
+jobs:
+- job: TFplan
+  pool:
+    vmImage: 'ubuntu-latest'
+  variables:
+    workDir: $(System.DefaultWorkingDirectory)
+  container:  
+    image: hashicorp/terraform:latest
+    options: -v $(workDir):/data -w /data -e "TF_CLI_CONFIG_FILE=.terraformrc"
+  steps:
+  - script: ./generateBackendConfig.sh $(TFE_WORKSPACE_TOKEN)
+    displayName: Generate backend config
+  - script: cat .terraformrc
+  - script: terraform init
+    displayName: Terraform Initialized
+  # - script: ./genPlan.sh 
+  #   displayName: Generate Terraform Plan
+
+- job: Placeholder
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - script: echo "Placeholder"
